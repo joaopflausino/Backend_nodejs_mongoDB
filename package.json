@@ -1,0 +1,23 @@
+{
+  "name": "backend_nodejs_mongodb",
+  "version": "1.0.0",
+  "description": "trabalho da faculdade usando nodejs mongo DB e mais algumass traquinagens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaopflausino/Backend_nodejs_mongoDB.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joaopflausino/Backend_nodejs_mongoDB/issues"
+  },
+  "homepage": "https://github.com/joaopflausino/Backend_nodejs_mongoDB#readme",
+  "dependencies": {
+    "mongodb": "^6.20.0",
+    "natural": "^8.1.0"
+  }
+}

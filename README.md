@@ -103,12 +103,6 @@ curl -X DELETE http://localhost:3000/api/posts/68dd8f099daefb5e0204671a
 
 ---
 
-## Health Check
-
-```bash
-curl http://localhost:3000/health
-```
-
 **Resposta:**
 ```json
 {

@@ -1,96 +1,118 @@
-const database = require('../config/database');
 const { ObjectId } = require('mongodb');
+const Connection = require('../database/connection');
+const Validator = require('../utils/Validator');
 
 class User {
-  constructor(userData = {}) {
-    this._id = userData._id || null;
-    this.username = userData.username || '';
-    this.email = userData.email || '';
-    this.displayName = userData.displayName || '';
-    this.bio = userData.bio || '';
-    this.createdAt = userData.createdAt || new Date();
-    this.isActive = userData.isActive !== undefined ? userData.isActive : true;
-  }
-}
-
-class UserService {
-  constructor() {
-    this.collection = null;
-  }
-
-  async getCollection() {
-    if (!this.collection) {
-      const db = await database.getDatabase();
-      this.collection = db.collection('users');
-    }
-    return this.collection;
-  }
-
-  async create(userData) {
-    const collection = await this.getCollection();
-
-    const existingUser = await collection.findOne({
-      $or: [
-        { username: userData.username },
-        { email: userData.email }
-      ]
-    });
-
-    if (existingUser) {
-      throw new Error(existingUser.username === userData.username ? 'Username exists' : 'Email exists');
+    constructor(userData = {}) {
+        this.username = userData.username;
+        this.email = userData.email;
+        this.createdAt = userData.createdAt || new Date();
+        this.connection = new Connection();
     }
 
-    const user = new User({
-      ...userData,
-      createdAt: new Date(),
-      isActive: true
-    });
+    async save() {
+        try {
+            Validator.validateUserData(this);
+            
+            const db = await this.connection.connect();
+            const collection = db.collection('users');
+            
+            const existingUser = await collection.findOne({
+                $or: [{ username: this.username }, { email: this.email }]
+            });
+            
+            if (existingUser) {
+                throw new Error('Usuário ou email já existe');
+            }
 
-    const result = await collection.insertOne(user);
-    return { ...user, _id: result.insertedId };
-  }
+            const result = await collection.insertOne({
+                username: this.username,
+                email: this.email,
+                createdAt: this.createdAt
+            });
 
-  async findById(id) {
-    const collection = await this.getCollection();
-    return await collection.findOne({ _id: new ObjectId(id), isActive: true });
-  }
+            return result.insertedId;
+        } catch (error) {
+            throw error;
+        } finally {
+            await this.connection.disconnect();
+        }
+    }
 
-  async findByUsername(username) {
-    const collection = await this.getCollection();
-    return await collection.findOne({ username, isActive: true });
-  }
+    static async findById(userId) {
+        const connection = new Connection();
+        
+        try {
+            const db = await connection.connect();
+            const collection = db.collection('users');
+            
+            const user = await collection.findOne({ _id: (ObjectId.isValid(userId) && userId.length === 24) ? ObjectId.createFromHexString(userId) : userId });
+            return user;
+        } catch (error) {
+            console.log('Erro ao buscar usuário por ID', error);
+            throw error;
+        } finally {
+            await connection.disconnect();
+        }
+    }
 
-  async update(id, updateData) {
-    const collection = await this.getCollection();
+    static async findByUsername(username) {
+        const connection = new Connection();
+        
+        try {
+            Validator.validateRequired(username, 'username');
+            
+            const db = await connection.connect();
+            const collection = db.collection('users');
+            
+            const user = await collection.findOne({ username: username });
+            return user;
+        } catch (error) {
+            console.log('Erro ao buscar usuário por username', error);
+            throw error;
+        } finally {
+            await connection.disconnect();
+        }
+    }
 
-    await collection.updateOne(
-      { _id: new ObjectId(id), isActive: true },
-      { $set: { ...updateData, updatedAt: new Date() } }
-    );
+    static async getAllUsers() {
+        const connection = new Connection();
+        
+        try {
+            const db = await connection.connect();
+            const collection = db.collection('users');
+            
+            const users = await collection.find({}).toArray();
+            return users;
+        } catch (error) {
+            console.log('Erro ao buscar todos os usuários', error);
+            throw error;
+        } finally {
+            await connection.disconnect();
+        }
+    }
 
-    return await this.findById(id);
-  }
-
-  async delete(id) {
-    const collection = await this.getCollection();
-
-    await collection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { isActive: false, updatedAt: new Date() } }
-    );
-  }
-
-  async list(filter = {}, limit = 20, skip = 0) {
-    const collection = await this.getCollection();
-
-    const query = { isActive: true, ...filter };
-    return await collection
-      .find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip(skip)
-      .toArray();
-  }
+    static async deleteById(userId) {
+        const connection = new Connection();
+        
+        try {
+            const db = await connection.connect();
+            const collection = db.collection('users');
+            
+            const result = await collection.deleteOne({ _id: (ObjectId.isValid(userId) && userId.length === 24) ? ObjectId.createFromHexString(userId) : userId });
+            
+            if (result.deletedCount > 0) {
+                console.log(`Usuário ${userId} deletado com sucesso`);
+            }
+            
+            return result.deletedCount > 0;
+        } catch (error) {
+            console.log('Erro ao deletar usuário', error);
+            throw error;
+        } finally {
+            await connection.disconnect();
+        }
+    }
 }
 
-module.exports = { User, UserService };
+module.exports = User;

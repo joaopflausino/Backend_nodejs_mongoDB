@@ -4,7 +4,9 @@
   "description": "trabalho da faculdade usando nodejs mongo DB e mais algumass traquinagens",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "demo": "node src/index.js",
+    "test": "node src/index.js"
   },
   "repository": {
     "type": "git",

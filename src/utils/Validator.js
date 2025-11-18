@@ -28,11 +28,25 @@ class Validator {
         this.validateRequired(userData.username, 'username');
         this.validateRequired(userData.email, 'email');
         this.validateStringLength(userData.username, 'username', 3, 30);
-        
+
         if (!this.validateEmail(userData.email)) {
             throw new Error('Email inválido');
         }
-        
+
+        return true;
+    }
+
+    static validatePassword(password) {
+        this.validateRequired(password, 'password');
+
+        if (password.length < 6) {
+            throw new Error('Senha deve ter no mínimo 6 caracteres');
+        }
+
+        if (password.length > 100) {
+            throw new Error('Senha deve ter no máximo 100 caracteres');
+        }
+
         return true;
     }
 }

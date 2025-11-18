@@ -165,8 +165,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`📍 http://localhost:${PORT}`);
+    console.log(` Servidor rodando na porta ${PORT}`);
+    console.log(` http://localhost:${PORT}`);
     console.log('\n=== ROTAS DISPONÍVEIS ===');
     console.log('GET    /health - Health check');
     console.log('\n--- Usuários ---');

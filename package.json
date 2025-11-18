@@ -4,7 +4,8 @@
   "description": "trabalho da faculdade usando nodejs mongo DB e mais algumass traquinagens",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/server-express.js",
+    "start:old": "node src/server.js",
     "demo": "node src/index.js",
     "test": "node src/index.js"
   },
@@ -19,6 +20,11 @@
   },
   "homepage": "https://github.com/joaopflausino/Backend_nodejs_mongoDB#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.3.0",
     "mongodb": "^6.20.0",
     "natural": "^8.1.0"
   }

@@ -43,18 +43,15 @@ class Post {
             const collection = db.collection('posts');
             console.log(`Salvando post para o usuário ${this.userId} com sentimento ${this.sentiment.sentiment}`);
 
-            // Garantir que confidence seja double (0-1)
             let confidence = parseFloat(this.sentiment.confidence);
             if (confidence > 1) {
                 confidence = confidence / 100;
             }
-            // Forçar double adicionando decimais se for inteiro
             if (confidence === 1) {
                 confidence = 1.0;
             }
             this.sentiment.confidence = confidence;
 
-            // Verificar se userId é válido
             console.log('userId recebido:', this.userId, 'tipo:', typeof this.userId, 'length:', this.userId?.length);
 
             let userIdObject;
